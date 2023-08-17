@@ -1,0 +1,17 @@
+#! /usr/bin/env bash
+
+# DOC: Check that local environment is ready to run civiform commands. Usage: bin/deploy
+# Optional params:
+#   --config=<config_file> to override config file
+#   --infra_commit=<commit_sha> to override infrastructure version. 
+#     Needs to be a valid commit from https://github.com/civiform/civiform.
+
+source bin/lib.sh
+source ${CONFIG}
+
+if [[ ! -z "${USE_DOCKER}" ]]; then
+    export COMMAND="doctor"
+    exec "bin/lib/run_from_docker"
+else 
+    CMD_NAME=doctor checkout::exec_delegated_command "$@"
+fi

@@ -1,0 +1,25 @@
+regions:
+  - us-east-1
+  - global
+
+account-blocklist:
+  - "664198874744"
+  - "305584670637"
+  - "496466114051"
+  - "559421412203"
+  - "859704899281"
+  - "098472360576"
+
+accounts:
+  "331156200916":
+    filters:
+      ACMCertificate:
+        - property: "DomainName"
+          value: "melanie-dev.civiform.dev"
+      IAMOpenIDConnectProvider:
+        - type: contains
+          value: "oidc-provider/token.actions.githubusercontent.com"
+      IAMRole:
+        - "OrganizationAccountAccessRole"
+      IAMRolePolicyAttachment:
+        - "OrganizationAccountAccessRole -> AdministratorAccess"
