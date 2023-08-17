@@ -7,29 +7,22 @@
 # cp civiform_config.example.sh civiform_config.sh
 #
 # Configuration variables must be specified in SCREAMING_SNAKE_CASE with the
-# "export" keyword preceding them. If the value contains whitespace it must be
-# surrounded by quotes. There should be no spaces before or after the equals sign.
+# "export" keyword preceding them. All values must be quoted as strings. There
+# should be no spaces before or after the equals sign.
 
 #################################################
 # Global variables for all CiviForm deployments
 #################################################
 
 # REQUIRED
-# One of prod or staging.
+# One of prod, staging, or dev.
 export CIVIFORM_MODE="staging"
 
 # REQUIRED
 # CiviForm server version to deploy.
 #
-# For dev and staging civiform modes, can be:
-# - "latest"
-# - A specific snapshot tag from https://hub.docker.com/r/civiform/civiform/tags
-# - A version from https://github.com/civiform/civiform/releases, for example "v1.2.3".
-# For prod:
-# - Should usually be a version from https://github.com/civiform/civiform/releases, 
-#   for example "v1.2.3".
-# - In the case where you need to quickly deploy a fix, can also be
-#   specific snapshot tag from https://hub.docker.com/r/civiform/civiform/tags
+# For dev and staging civiform modes, can be "latest". For prod, must be a version from
+# https://github.com/civiform/civiform/releases, for example "v1.2.3".
 export CIVIFORM_VERSION="latest"
 
 # REQUIRED
@@ -43,8 +36,6 @@ export CIVIFORM_VERSION="latest"
 # Using "latest" is recommended.
 export CIVIFORM_CLOUD_DEPLOYMENT_VERSION="latest"
 
-
-
 # Terraform configuration
 #################################################
 
@@ -52,6 +43,7 @@ export CIVIFORM_CLOUD_DEPLOYMENT_VERSION="latest"
 # A supported CiviForm cloud provider, lower case.
 # "aws" or "azure"
 export CIVIFORM_CLOUD_PROVIDER="aws"
+
 
 # REQUIRED
 # The template directory for this deployment.
@@ -70,12 +62,24 @@ export DOCKER_USERNAME="civiform"
 # REQUIRED
 # The authentication protocal used for applicant and trusted intermediary accounts.
 # Supported values: "oidc", "saml"
-export CIVIFORM_APPLICANT_AUTH_PROTOCOL=""
+export CIVIFORM_APPLICANT_AUTH_PROTOCOL="oidc"
 
 
 
 # Deployment-specific Civiform configuration
 #################################################
+
+# REQUIRED
+# The short name for the civic entity. Ex. "Rochester"
+export CIVIC_ENTITY_SHORT_NAME="Demo"
+
+# REQUIRED
+# The full name for the civic entity. Ex. "City of Rochester"
+export CIVIC_ENTITY_FULL_NAME="City of Demo"
+
+# REQUIRED
+# The email address to contact for support with using Civiform. Ex. "Civiform@CityOfRochester.gov
+export CIVIC_ENTITY_SUPPORT_EMAIL_ADDRESS="civiform-demo@exygy.com"
 
 # REQUIRED
 # A link to an image of the civic entity logo that includes the entity name, to be used in the header for the "Get Benefits" page
@@ -92,36 +96,36 @@ export FAVICON_URL="https://civiform.us/favicon.png"
 
 # REQUIRED
 # The email address to use for the "from" field in emails sent from CiviForm.
-export SENDER_EMAIL_ADDRESS=""
+export SENDER_EMAIL_ADDRESS="civiform-demo@exygy.com"
 
 # REQUIRED
 # The email address that receives a notifications email each time an applicant
 # submits an application to a program in the staging environments, instead of
 # sending it to the program administrator's email, as would happen in prod.
-export STAGING_PROGRAM_ADMIN_NOTIFICATION_MAILING_LIST=""
+export STAGING_PROGRAM_ADMIN_NOTIFICATION_MAILING_LIST="civiform-demo@exygy.com"
 
 # REQUIRED
 # The email address that receives a notifications email each time an applicant
 # submits an application to a program in the staging environments, instead of
 # sending it to the trusted intermediary's email, as would happen in prod.
-export STAGING_TI_NOTIFICATION_MAILING_LIST=""
+export STAGING_TI_NOTIFICATION_MAILING_LIST="civiform-demo@exygy.com"
 
 # REQUIRED
 # The email address that receives a notifications email each time an applicant
 # submits an application to a program in the staging environments, instead of
 # sending it to the applicant's email, as would happen in prod.
-export STAGING_APPLICANT_NOTIFICATION_MAILING_LIST=""
+export STAGING_APPLICANT_NOTIFICATION_MAILING_LIST="civiform-demo@exygy.com"
 
 # REQUIRED
 # The domain name for this CiviForm deployment, including the protocol. 
 # E.g. "https://civiform.seattle.gov"
-export BASE_URL=""
+export BASE_URL="https://civiform-demo.civiform.dev"
 
 # OPTIONAL
 # When set enables demo mode for the civiform application. Should be set for
 # staging but not prod. The value is hostname without protocol and should correspond
 # BASE_URl. Example: "civiform.seattle.gov"
-export STAGING_HOSTNAME=""
+export STAGING_HOSTNAME="civiform-demo.civiform.dev"
 
 # OPTIONAL
 # The time zone to be used when rendering any times within the CiviForm
@@ -212,7 +216,7 @@ export AWS_REGION="us-east-1"
 
 # REQUIRED
 # The name to prefix all resources with.
-export APP_PREFIX="my-deploy" # max 19 chars, only numbers, letters, dashes, and underscores
+export APP_PREFIX="civiform-demo" # max 19 chars, only numbers, letters, dashes, and underscores
 
 # REQUIRED
 # ARN of the SSL certificate that will be used to handle HTTPS traffic. The certiciate
@@ -220,33 +224,14 @@ export APP_PREFIX="my-deploy" # max 19 chars, only numbers, letters, dashes, and
 # in AWS web console: https://console.aws.amazon.com/acm/home#/certificates/list
 # WARNING: certificate needs to be created in the same region as AWS_REGION above, make sure
 # select correct region in web AWS console when creating certificate.
-export SSL_CERTIFICATE_ARN=""
+export SSL_CERTIFICATE_ARN="arn:aws:acm:us-east-1:601007613272:certificate/67ab5c40-b496-45f2-8f95-aaa67cbfd212"
 
-# REQUIRED
+# RERUIRED
 # Number of Civiform server tasks to run. This value can be set to 0 to shutdown servers.
 # It can be useful, for example, when server continiously fails on startup: set this to 0
 # to shutdown servers while figuring out the error.
 export FARGATE_DESIRED_TASK_COUNT=1
 
-# OPTIONAL
-# The AWS RDS instance type for the Postgres database. For possible values, see:
-# https://github.com/civiform/cloud-deploy-infra/blob/main/cloud/aws/templates/aws_oidc/variable_definitions.json
-#
-# Changes to this value will result in database downtime. AWS applies the
-# requested change during the next maintenance window.
-# export POSTGRES_INSTANCE_CLASS="db.t3.micro"
-
-# OPTIONAL
-# The storage capacity of the AWS RDS instance in GiB. Note:
-#
-# - The capacity cannot be decreased after storage has been allocated.
-# - Capacity increases of less than 10% are not allowed.
-#
-# Changes to this value will result in database downtime. AWS applies the
-# requested change during the next maintenance window. Storage optimization
-# will take 6+ hours, during which further storage modifications are not
-# allowed.
-# export POSTGRES_STORAGE_GB=5
 
 
 # generic-oidc Auth configuration
@@ -257,20 +242,15 @@ export FARGATE_DESIRED_TASK_COUNT=1
 # If set to a non-disabled value, you must configure the respective auth parameters
 export CIVIFORM_APPLICANT_IDP="generic-oidc"
 
-# REQUIRED if CIVIFORM_APPLICANT_IDP="generic-oidc"
+# REQUIRED iff CIVIFORM_APPLICANT_IDP="generic-oidc"
 # The name of the OIDC provider. Must be URL-safe.
 # Gets appended to the auth callback URL.
 export APPLICANT_OIDC_PROVIDER_NAME="OidcClient"
 
-# REQUIRED if CIVIFORM_APPLICANT_IDP="generic-oidc"
+# REQUIRED iff CIVIFORM_APPLICANT_IDP="generic-oidc"
 # The discovery metadata URI provideded by the OIDC provider.
 # Usually ends in .well-known/openid-configuration
 export APPLICANT_OIDC_DISCOVERY_URI="https://civiform-staging.us.auth0.com/.well-known/openid-configuration"
-
-# REQUIRED if CIVIFORM_APPLICANT_IDP="generic-oidc"
-# The URL applicants are redirected to for creating an account
-# with the identity provider.
-export APPLICANT_REGISTER_URI=""
 
 # OPTIONAL
 # The type of OIDC flow to execute, and how the data is encoded.
@@ -301,10 +281,6 @@ export APPLICANT_OIDC_FIRST_NAME_ATTRIBUTE="name"
 export APPLICANT_OIDC_MIDDLE_NAME_ATTRIBUTE=""
 export APPLICANT_OIDC_LAST_NAME_ATTRIBUTE=""
 
-# The name of the authentication provider applicants use to login.
-# This value is displayed to the applicants to help them understand which account to use.
-export APPLICANT_PORTAL_NAME=""
-
 
 
 # ADFS and Azure AD configuration
@@ -314,7 +290,7 @@ export APPLICANT_PORTAL_NAME=""
 # REQUIRED
 # The discovery metadata URI provideded by the ADFS provider.
 # Usually ends in .well-known/openid-configuration
-export ADFS_DISCOVERY_URI="https://civiform-staging.us.auth0.com/.well-known/openid-configuration"
+export ADFS_DISCOVERY_URI="https://login.microsoftonline.com/65d2c1ac-375c-4d0e-92e5-9d1af6be8d5c/v2.0/.well-known/openid-configuration"
 
 # OPTIONAL
 # Should be set to "allatclaims" for ADFS and empty value for Azure AD.
@@ -322,9 +298,9 @@ export ADFS_ADDITIONAL_SCOPES="allatclaims"
 
 # OPTIONAL
 # Should be set to "group" for ADFS and "groups" for Azure AD.
-export AD_GROUPS_ATTRIBUTE_NAME="group"
+export AD_GROUPS_ATTRIBUTE_NAME="groups"
 
 # OPTIONAL
 # The ADFS group name for specifying CiviForm admins. If using Azure AD this is
 # the group's object ID
-export ADFS_ADMIN_GROUP=""
+export ADFS_ADMIN_GROUP="6a65af0c-9e54-4c4f-9d62-7810fb7f2cfb"
